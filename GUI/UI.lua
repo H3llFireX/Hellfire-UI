@@ -1,44 +1,174 @@
-
---// Cache
-
-local loadstring, game, getgenv, setclipboard = loadstring, game, getgenv, setclipboard
-
---// Loaded check
-
-if getgenv().Aimbot then return end
-
---// Load HellfireX (Raw)
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/HellfireX/Aimbot-V2/main/Resources/Scripts/Raw%20Main.lua"))()
-
---// Variables
-
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Libs/PepsiUILibrary.lua"))()
 local Aimbot = getgenv().Aimbot
+if not Aimbot then
+    warn("[UI] Aimbot not detected — make sure to run the loader first!")
+    return
+end
+
 local Settings, FOVSettings, Functions = Aimbot.Settings, Aimbot.FOVSettings, Aimbot.Functions
 
-local Library = loadstring(game:GetObjects("rbxassetid://7657867786")[1].Source)() -- Pepsi's UI Library
-
-local Parts = {"Head", "HumanoidRootPart", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg", "LeftHand", "RightHand", "LeftLowerArm", "RightLowerArm", "LeftUpperArm", "RightUpperArm", "LeftFoot", "LeftLowerLeg", "UpperTorso", "LeftUpperLeg", "RightFoot", "RightLowerLeg", "LowerTorso", "RightUpperLeg"}
-
---// Frame
-
-Library.UnloadCallback = Functions.Exit
-
 local MainFrame = Library:CreateWindow({
-	Name = "HellfireX",
-	Themeable = {
-		Image = "7059346386",
-		Info = "HellfireX GUI\nPowered by Pepsi's UI Library",
-		Credit = false
-	},
-	Background = "",
-	Theme = [[{"__Designer.Colors.section":"ADC7FF","__Designer.Colors.topGradient":"1B242F","__Designer.Settings.ShowHideKey":"Enum.KeyCode.RightShift","__Designer.Colors.otherElementText":"54637D","__Designer.Colors.hoveredOptionBottom":"38667D","__Designer.Background.ImageAssetID":"","__Designer.Colors.unhoveredOptionTop":"407495","__Designer.Colors.innerBorder":"2C4168","__Designer.Colors.unselectedOption":"4E6EA0","__Designer.Background.UseBackgroundImage":true,"__Designer.Files.WorkspaceFile":"HellfireX","__Designer.Colors.main":"23A0FF","__Designer.Colors.outerBorder":"162943","__Designer.Background.ImageColor":"FFFFFF","__Designer.Colors.tabText":"C9DFF1","__Designer.Colors.elementBorder":"111D26","__Designer.Colors.sectionBackground":"0E141C","__Designer.Colors.selectedOption":"558AC2","__Designer.Colors.background":"11182A","__Designer.Colors.bottomGradient":"202B42","__Designer.Background.ImageTransparency":95,"__Designer.Colors.hoveredOptionTop":"4885A0","__Designer.Colors.elementText":"7692B8","__Designer.Colors.unhoveredOptionBottom":"5471C4"}]]
+    Name = "HellfireX",
+    Themeable = {
+        Image = "rbxassetid://7059346386",
+        Info = "Once you enter the fire, there's no turning back",
+        Credit = false
+    },
+    Background = "",
+    Theme = [[{
+        "__Designer.Settings.ShowHideKey": "Enum.KeyCode.Delete"
+    }]]
 })
 
---// Tabs
+--// Aimbot Tab (Merged Core, Checks, FOV)
+local AimbotTab = MainFrame:CreateTab({
+    Name = "Aimbot"
+})
 
-local SettingsTab = MainFrame:CreateTab({ Name = "Settings" })
-local FOVSettingsTab = MainFrame:CreateTab({ Name = "FOV Settings" })
-local FunctionsTab = MainFrame:CreateTab({ Name = "Functions" })
+-- Core Settings
+local CoreSection = AimbotTab:CreateSection({ Name = "Core Settings" })
 
--- Continue with sections/controls as per original message
+CoreSection:AddToggle({
+    Name = "Enabled",
+    Value = Settings.Enabled,
+    Callback = function(v) Settings.Enabled = v end
+}).Default = Settings.Enabled
+
+CoreSection:AddToggle({
+    Name = "Toggle Mode",
+    Value = Settings.Toggle,
+    Callback = function(v) Settings.Toggle = v end
+}).Default = Settings.Toggle
+
+CoreSection:AddTextbox({
+    Name = "Trigger Key",
+    Value = Settings.TriggerKey,
+    Callback = function(v) Settings.TriggerKey = v end
+}).Default = Settings.TriggerKey
+
+CoreSection:AddSlider({
+    Name = "Sensitivity",
+    Value = Settings.Sensitivity,
+    Min = 0,
+    Max = 1,
+    Decimals = 2,
+    Callback = function(v) Settings.Sensitivity = v end
+}).Default = Settings.Sensitivity
+
+-- Targeting Checks
+local CheckSection = AimbotTab:CreateSection({ Name = "Targeting Checks" })
+
+CheckSection:AddToggle({
+    Name = "Team Check",
+    Value = Settings.TeamCheck,
+    Callback = function(v) Settings.TeamCheck = v end
+}).Default = Settings.TeamCheck
+
+CheckSection:AddToggle({
+    Name = "Alive Check",
+    Value = Settings.AliveCheck,
+    Callback = function(v) Settings.AliveCheck = v end
+}).Default = Settings.AliveCheck
+
+CheckSection:AddToggle({
+    Name = "Wall Check",
+    Value = Settings.WallCheck,
+    Callback = function(v) Settings.WallCheck = v end
+}).Default = Settings.WallCheck
+
+-- FOV Settings
+local FOVSection = AimbotTab:CreateSection({ Name = "FOV Settings" })
+
+FOVSection:AddToggle({
+    Name = "Show FOV Circle",
+    Value = FOVSettings.Visible,
+    Callback = function(v) FOVSettings.Visible = v end
+}).Default = FOVSettings.Visible
+
+FOVSection:AddToggle({
+    Name = "Enabled",
+    Value = FOVSettings.Enabled,
+    Callback = function(v) FOVSettings.Enabled = v end
+}).Default = FOVSettings.Enabled
+
+FOVSection:AddSlider({
+    Name = "Radius",
+    Value = FOVSettings.Amount,
+    Min = 10,
+    Max = 300,
+    Decimals = 0,
+    Callback = function(v) FOVSettings.Amount = v end
+}).Default = FOVSettings.Amount
+
+FOVSection:AddSlider({
+    Name = "Thickness",
+    Value = FOVSettings.Thickness,
+    Min = 1,
+    Max = 50,
+    Callback = function(v) FOVSettings.Thickness = v end
+}).Default = FOVSettings.Thickness
+
+FOVSection:AddSlider({
+    Name = "Transparency",
+    Value = FOVSettings.Transparency,
+    Min = 0,
+    Max = 1,
+    Decimals = 2,
+    Callback = function(v) FOVSettings.Transparency = v end
+}).Default = FOVSettings.Transparency
+
+FOVSection:AddSlider({
+    Name = "Sides",
+    Value = FOVSettings.Sides,
+    Min = 3,
+    Max = 60,
+    Callback = function(v) FOVSettings.Sides = v end
+}).Default = FOVSettings.Sides
+
+FOVSection:AddToggle({
+    Name = "Filled Circle",
+    Value = FOVSettings.Filled,
+    Callback = function(v) FOVSettings.Filled = v end
+}).Default = FOVSettings.Filled
+
+FOVSection:AddColorpicker({
+    Name = "Circle Color",
+    Value = FOVSettings.Color,
+    Callback = function(v) FOVSettings.Color = v end
+}).Default = FOVSettings.Color
+
+FOVSection:AddColorpicker({
+    Name = "Locked Target Color",
+    Value = FOVSettings.LockedColor,
+    Callback = function(v) FOVSettings.LockedColor = v end
+}).Default = FOVSettings.LockedColor
+
+-- Functions Tab
+local FunctionsTab = MainFrame:CreateTab({
+    Name = "Functions"
+})
+
+local FuncSection = FunctionsTab:CreateSection({
+    Name = "Aimbot Functions"
+})
+
+FuncSection:AddButton({
+    Name = "Reset Settings",
+    Callback = function()
+        Functions.ResetSettings()
+        Library.ResetAll()
+    end
+})
+
+FuncSection:AddButton({
+    Name = "Restart",
+    Callback = Functions.Restart
+})
+
+FuncSection:AddButton({
+    Name = "Exit",
+    Callback = function()
+        Functions.Exit()
+        Library.Unload()
+    end
+})
