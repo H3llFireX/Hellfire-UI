@@ -15,17 +15,13 @@ local MainFrame = Library:CreateWindow({
         Credit = false
     },
     Background = "",
-    Theme = [[{
-        "__Designer.Settings.ShowHideKey": "Enum.KeyCode.Delete"
-    }]]
+    Theme = [[{ "__Designer.Settings.ShowHideKey": "Enum.KeyCode.Delete" }]]
 })
 
---// Aimbot Tab (Merged Core, Checks, FOV)
-local AimbotTab = MainFrame:CreateTab({
-    Name = "Aimbot"
-})
+--// Aimbot Tab
+local AimbotTab = MainFrame:CreateTab({ Name = "Aimbot" })
 
--- Core Settings
+-- Core
 local CoreSection = AimbotTab:CreateSection({ Name = "Core Settings" })
 
 CoreSection:AddToggle({
@@ -55,7 +51,7 @@ CoreSection:AddSlider({
     Callback = function(v) Settings.Sensitivity = v end
 }).Default = Settings.Sensitivity
 
--- Targeting Checks
+-- Checks
 local CheckSection = AimbotTab:CreateSection({ Name = "Targeting Checks" })
 
 CheckSection:AddToggle({
@@ -76,7 +72,7 @@ CheckSection:AddToggle({
     Callback = function(v) Settings.WallCheck = v end
 }).Default = Settings.WallCheck
 
--- FOV Settings
+-- FOV
 local FOVSection = AimbotTab:CreateSection({ Name = "FOV Settings" })
 
 FOVSection:AddToggle({
@@ -143,14 +139,10 @@ FOVSection:AddColorpicker({
     Callback = function(v) FOVSettings.LockedColor = v end
 }).Default = FOVSettings.LockedColor
 
--- Functions Tab
-local FunctionsTab = MainFrame:CreateTab({
-    Name = "Functions"
-})
+--// Functions Tab
+local FunctionsTab = MainFrame:CreateTab({ Name = "Functions" })
 
-local FuncSection = FunctionsTab:CreateSection({
-    Name = "Aimbot Functions"
-})
+local FuncSection = FunctionsTab:CreateSection({ Name = "Aimbot Functions" })
 
 FuncSection:AddButton({
     Name = "Reset Settings",
@@ -172,3 +164,53 @@ FuncSection:AddButton({
         Library.Unload()
     end
 })
+
+--// ESP Tab
+local ESPSettings = getgenv().ESPSettings or {
+    Enabled = true,
+    ShowNames = true,
+    ShowHealth = true,
+    ShowBoxes = true,
+    ShowDirection = true,
+    TeamCheck = true,
+}
+getgenv().ESPSettings = ESPSettings
+
+local ESPTab = MainFrame:CreateTab({ Name = "ESP" })
+local Options = ESPTab:CreateSection({ Name = "Options" })
+
+Options:AddToggle({
+    Name = "Enabled",
+    Value = ESPSettings.Enabled,
+    Callback = function(val) ESPSettings.Enabled = val end
+}).Default = ESPSettings.Enabled
+
+Options:AddToggle({
+    Name = "Show Names",
+    Value = ESPSettings.ShowNames,
+    Callback = function(val) ESPSettings.ShowNames = val end
+}).Default = ESPSettings.ShowNames
+
+Options:AddToggle({
+    Name = "Show Health Bars",
+    Value = ESPSettings.ShowHealth,
+    Callback = function(val) ESPSettings.ShowHealth = val end
+}).Default = ESPSettings.ShowHealth
+
+Options:AddToggle({
+    Name = "Show Boxes",
+    Value = ESPSettings.ShowBoxes,
+    Callback = function(val) ESPSettings.ShowBoxes = val end
+}).Default = ESPSettings.ShowBoxes
+
+Options:AddToggle({
+    Name = "Show Direction Line",
+    Value = ESPSettings.ShowDirection,
+    Callback = function(val) ESPSettings.ShowDirection = val end
+}).Default = ESPSettings.ShowDirection
+
+Options:AddToggle({
+    Name = "Team Check",
+    Value = ESPSettings.TeamCheck,
+    Callback = function(val) ESPSettings.TeamCheck = val end
+}).Default = ESPSettings.TeamCheck
