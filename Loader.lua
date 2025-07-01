@@ -1,4 +1,4 @@
---// Executor Detection (Robust)
+--// Executor Detection
 local executor = "Unknown"
 
 pcall(function()
@@ -19,7 +19,6 @@ pcall(function()
     end
 end)
 
---// Normalize to folder-safe name
 executor = executor:lower()
 
 local folder
@@ -28,23 +27,23 @@ if executor:find("xeno") then
 elseif executor:find("jjsploit") then
     folder = "JJSploit"
 else
-    warn("[Loader] Unsupported executor: " .. executor)
+    warn("[Loader] Unsupported executor:", executor)
+    return
 end
 
---// Load executor-specific aimbot (if supported)
-local successAimbot = false
-if folder then
-    local aimbotURL = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/" .. folder .. "/Aimbot.lua"
+--// URLs (updated to use Scripts/ folder)
+local base = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
+local aimbotURL = base .. "Scripts/" .. folder .. "/Aimbot.lua"
+local guiURL = base .. "GUI/UI.lua"
 
-    local ok, err = pcall(function()
-        loadstring(game:HttpGet(aimbotURL))()
-    end)
-    successAimbot = ok
-    warn(ok and "[Loader] Aimbot loaded successfully" or "[Loader] Aimbot failed: " .. tostring(err))
-end
-
---// Load GUI (independent of executor)
-local okGUI, errGUI = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/GUI/UI.lua"))()
+--// Load Aimbot
+local ok1, err1 = pcall(function()
+    loadstring(game:HttpGet(aimbotURL))()
 end)
-warn(okGUI and "[Loader] GUI loaded successfully" or "[Loader] GUI failed: " .. tostring(errGUI))
+warn(ok1 and "[Loader] Aimbot loaded ✅" or "[Loader] Aimbot failed ❌:", err1)
+
+--// Load GUI
+local ok2, err2 = pcall(function()
+    loadstring(game:HttpGet(guiURL))()
+end)
+warn(ok2 and "[Loader] GUI loaded ✅" or "[Loader] GUI failed ❌:", err2)
