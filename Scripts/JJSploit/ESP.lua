@@ -5,14 +5,7 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local ESPSettings = {
-    Enabled = true,
-    ShowNames = true,
-    ShowHealth = true,
-    ShowBoxes = true,
-    ShowDirection = true,
-    TeamCheck = true,
-}
+local ESPSettings = getgenv().ESPSettings
 
 local function IsPlayerVisible(player)
     if ESPSettings.TeamCheck and player.Team == LocalPlayer.Team then return false end
