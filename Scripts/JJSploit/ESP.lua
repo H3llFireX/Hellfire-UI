@@ -52,7 +52,7 @@ RunService.RenderStepped:Connect(function()
                 local esp = ESPContainer[player]
 
                 -- Box
-                if ESPSettings.ShowBoxes and onScreen then
+                if getgenv().ESPSettings.ShowBoxes and onScreen then
                     esp.Box.Size = Vector2.new(math.abs(bottomRight.X - topLeft.X), math.abs(bottomRight.Y - topLeft.Y))
                     esp.Box.Position = Vector2.new(topLeft.X, topLeft.Y)
                     esp.Box.Visible = true
