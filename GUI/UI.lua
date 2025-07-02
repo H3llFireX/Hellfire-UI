@@ -1,12 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Libs/PepsiUILibrary.lua"))()
-
-local Aimbot = getgenv().Aimbot
-if not Aimbot then
-    warn("[UI] Aimbot not detected — make sure to run the loader first!")
-    return
-end
-
-local Settings, FOVSettings, Functions = Aimbot.Settings, Aimbot.FOVSettings, Aimbot.Functions
+local Aimbot = getgenv().Aimbot or {}
 local ESPSettings = getgenv().ESPSettings or {
     Enabled = true,
     ShowNames = true,
@@ -16,6 +9,10 @@ local ESPSettings = getgenv().ESPSettings or {
     TeamCheck = true,
 }
 getgenv().ESPSettings = ESPSettings
+
+local Settings = Aimbot.Settings or {}
+local FOVSettings = Aimbot.FOVSettings or {}
+local Functions = Aimbot.Functions or {}
 
 local MainFrame = Library:CreateWindow({
     Name = "HellfireX",
@@ -30,176 +27,52 @@ local MainFrame = Library:CreateWindow({
     }]]
 })
 
---// Aimbot Tab
+-- Aimbot Tab
 local AimbotTab = MainFrame:CreateTab({ Name = "Aimbot" })
 
-AimbotTab:AddToggle({
-    Name = "Enabled",
-    Value = Settings.Enabled,
-    Callback = function(v) Settings.Enabled = v end
-}).Default = Settings.Enabled
+-- Aimbot Core Settings
+local Core = AimbotTab:CreateSection({ Name = "Core Settings" })
 
-AimbotTab:AddToggle({
-    Name = "Toggle Mode",
-    Value = Settings.Toggle,
-    Callback = function(v) Settings.Toggle = v end
-}).Default = Settings.Toggle
+Core:AddToggle({ Name = "Enabled", Value = Settings.Enabled, Callback = function(v) Settings.Enabled = v end })
+Core:AddToggle({ Name = "Toggle Mode", Value = Settings.Toggle, Callback = function(v) Settings.Toggle = v end })
+Core:AddTextbox({ Name = "Trigger Key", Value = Settings.TriggerKey, Callback = function(v) Settings.TriggerKey = v end })
+Core:AddSlider({ Name = "Sensitivity", Value = Settings.Sensitivity, Min = 0, Max = 1, Decimals = 2, Callback = function(v) Settings.Sensitivity = v end })
 
-AimbotTab:AddTextbox({
-    Name = "Trigger Key",
-    Value = Settings.TriggerKey,
-    Callback = function(v) Settings.TriggerKey = v end
-}).Default = Settings.TriggerKey
+-- Aimbot Checks
+local Checks = AimbotTab:CreateSection({ Name = "Checks" })
 
-AimbotTab:AddSlider({
-    Name = "Sensitivity",
-    Value = Settings.Sensitivity,
-    Min = 0,
-    Max = 1,
-    Decimals = 2,
-    Callback = function(v) Settings.Sensitivity = v end
-}).Default = Settings.Sensitivity
+Checks:AddToggle({ Name = "Team Check", Value = Settings.TeamCheck, Callback = function(v) Settings.TeamCheck = v end })
+Checks:AddToggle({ Name = "Alive Check", Value = Settings.AliveCheck, Callback = function(v) Settings.AliveCheck = v end })
+Checks:AddToggle({ Name = "Wall Check", Value = Settings.WallCheck, Callback = function(v) Settings.WallCheck = v end })
 
-AimbotTab:AddToggle({
-    Name = "Team Check",
-    Value = Settings.TeamCheck,
-    Callback = function(v) Settings.TeamCheck = v end
-}).Default = Settings.TeamCheck
+-- Aimbot FOV
+local FOV = AimbotTab:CreateSection({ Name = "FOV Settings" })
 
-AimbotTab:AddToggle({
-    Name = "Alive Check",
-    Value = Settings.AliveCheck,
-    Callback = function(v) Settings.AliveCheck = v end
-}).Default = Settings.AliveCheck
+FOV:AddToggle({ Name = "Enabled", Value = FOVSettings.Enabled, Callback = function(v) FOVSettings.Enabled = v end })
+FOV:AddToggle({ Name = "Show FOV Circle", Value = FOVSettings.Visible, Callback = function(v) FOVSettings.Visible = v end })
+FOV:AddSlider({ Name = "Radius", Value = FOVSettings.Amount, Min = 10, Max = 300, Callback = function(v) FOVSettings.Amount = v end })
+FOV:AddSlider({ Name = "Thickness", Value = FOVSettings.Thickness, Min = 1, Max = 50, Callback = function(v) FOVSettings.Thickness = v end })
+FOV:AddSlider({ Name = "Transparency", Value = FOVSettings.Transparency, Min = 0, Max = 1, Decimals = 2, Callback = function(v) FOVSettings.Transparency = v end })
+FOV:AddSlider({ Name = "Sides", Value = FOVSettings.Sides, Min = 3, Max = 60, Callback = function(v) FOVSettings.Sides = v end })
+FOV:AddToggle({ Name = "Filled Circle", Value = FOVSettings.Filled, Callback = function(v) FOVSettings.Filled = v end })
+FOV:AddColorpicker({ Name = "FOV Color", Value = FOVSettings.Color, Callback = function(v) FOVSettings.Color = v end })
+FOV:AddColorpicker({ Name = "Locked Color", Value = FOVSettings.LockedColor, Callback = function(v) FOVSettings.LockedColor = v end })
 
-AimbotTab:AddToggle({
-    Name = "Wall Check",
-    Value = Settings.WallCheck,
-    Callback = function(v) Settings.WallCheck = v end
-}).Default = Settings.WallCheck
-
-AimbotTab:AddToggle({
-    Name = "Show FOV Circle",
-    Value = FOVSettings.Visible,
-    Callback = function(v) FOVSettings.Visible = v end
-}).Default = FOVSettings.Visible
-
-AimbotTab:AddToggle({
-    Name = "FOV Enabled",
-    Value = FOVSettings.Enabled,
-    Callback = function(v) FOVSettings.Enabled = v end
-}).Default = FOVSettings.Enabled
-
-AimbotTab:AddSlider({
-    Name = "FOV Radius",
-    Value = FOVSettings.Amount,
-    Min = 10,
-    Max = 300,
-    Callback = function(v) FOVSettings.Amount = v end
-}).Default = FOVSettings.Amount
-
-AimbotTab:AddSlider({
-    Name = "FOV Thickness",
-    Value = FOVSettings.Thickness,
-    Min = 1,
-    Max = 50,
-    Callback = function(v) FOVSettings.Thickness = v end
-}).Default = FOVSettings.Thickness
-
-AimbotTab:AddSlider({
-    Name = "FOV Transparency",
-    Value = FOVSettings.Transparency,
-    Min = 0,
-    Max = 1,
-    Decimals = 2,
-    Callback = function(v) FOVSettings.Transparency = v end
-}).Default = FOVSettings.Transparency
-
-AimbotTab:AddSlider({
-    Name = "FOV Sides",
-    Value = FOVSettings.Sides,
-    Min = 3,
-    Max = 60,
-    Callback = function(v) FOVSettings.Sides = v end
-}).Default = FOVSettings.Sides
-
-AimbotTab:AddToggle({
-    Name = "FOV Filled",
-    Value = FOVSettings.Filled,
-    Callback = function(v) FOVSettings.Filled = v end
-}).Default = FOVSettings.Filled
-
-AimbotTab:AddColorpicker({
-    Name = "FOV Color",
-    Value = FOVSettings.Color,
-    Callback = function(v) FOVSettings.Color = v end
-}).Default = FOVSettings.Color
-
-AimbotTab:AddColorpicker({
-    Name = "Locked Target Color",
-    Value = FOVSettings.LockedColor,
-    Callback = function(v) FOVSettings.LockedColor = v end
-}).Default = FOVSettings.LockedColor
-
---// ESP Tab
+-- ESP Tab
 local ESPTab = MainFrame:CreateTab({ Name = "ESP" })
+local ESPOptions = ESPTab:CreateSection({ Name = "Options" })
 
-ESPTab:AddToggle({
-    Name = "Enabled",
-    Value = ESPSettings.Enabled,
-    Callback = function(val) ESPSettings.Enabled = val end
-}).Default = ESPSettings.Enabled
+ESPOptions:AddToggle({ Name = "Enabled", Value = ESPSettings.Enabled, Callback = function(v) ESPSettings.Enabled = v end })
+ESPOptions:AddToggle({ Name = "Show Boxes", Value = ESPSettings.ShowBoxes, Callback = function(v) ESPSettings.ShowBoxes = v end })
+ESPOptions:AddToggle({ Name = "Show Direction", Value = ESPSettings.ShowDirection, Callback = function(v) ESPSettings.ShowDirection = v end })
+ESPOptions:AddToggle({ Name = "Show Health Bars", Value = ESPSettings.ShowHealth, Callback = function(v) ESPSettings.ShowHealth = v end })
+ESPOptions:AddToggle({ Name = "Show Names", Value = ESPSettings.ShowNames, Callback = function(v) ESPSettings.ShowNames = v end })
+ESPOptions:AddToggle({ Name = "Team Check", Value = ESPSettings.TeamCheck, Callback = function(v) ESPSettings.TeamCheck = v end })
 
-ESPTab:AddToggle({
-    Name = "Show Names",
-    Value = ESPSettings.ShowNames,
-    Callback = function(val) ESPSettings.ShowNames = val end
-}).Default = ESPSettings.ShowNames
+-- Functions Tab
+local FuncTab = MainFrame:CreateTab({ Name = "Functions" })
+local Funcs = FuncTab:CreateSection({ Name = "Actions" })
 
-ESPTab:AddToggle({
-    Name = "Show Health Bars",
-    Value = ESPSettings.ShowHealth,
-    Callback = function(val) ESPSettings.ShowHealth = val end
-}).Default = ESPSettings.ShowHealth
-
-ESPTab:AddToggle({
-    Name = "Show Boxes",
-    Value = ESPSettings.ShowBoxes,
-    Callback = function(val) ESPSettings.ShowBoxes = val end
-}).Default = ESPSettings.ShowBoxes
-
-ESPTab:AddToggle({
-    Name = "Show Direction Line",
-    Value = ESPSettings.ShowDirection,
-    Callback = function(val) ESPSettings.ShowDirection = val end
-}).Default = ESPSettings.ShowDirection
-
-ESPTab:AddToggle({
-    Name = "Team Check",
-    Value = ESPSettings.TeamCheck,
-    Callback = function(val) ESPSettings.TeamCheck = val end
-}).Default = ESPSettings.TeamCheck
-
---// Functions Tab
-local FunctionsTab = MainFrame:CreateTab({ Name = "Functions" })
-
-FunctionsTab:AddButton({
-    Name = "Reset Settings",
-    Callback = function()
-        Functions.ResetSettings()
-        Library.ResetAll()
-    end
-})
-
-FunctionsTab:AddButton({
-    Name = "Restart",
-    Callback = Functions.Restart
-})
-
-FunctionsTab:AddButton({
-    Name = "Exit",
-    Callback = function()
-        Functions.Exit()
-        Library.Unload()
-    end
-})
+Funcs:AddButton({ Name = "Reset Settings", Callback = function() if Functions.ResetSettings then Functions.ResetSettings() end Library.ResetAll() end })
+Funcs:AddButton({ Name = "Restart", Callback = function() if Functions.Restart then Functions.Restart() end end })
+Funcs:AddButton({ Name = "Exit", Callback = function() if Functions.Exit then Functions.Exit() end Library.Unload() end })
