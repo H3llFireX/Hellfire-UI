@@ -1,8 +1,6 @@
---// HellfireX Loader
-local baseUrl = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
-
--- Detect executor
+-- Detect Executor
 local executor = "Unknown"
+
 pcall(function()
     if identifyexecutor then
         executor = identifyexecutor()
@@ -21,34 +19,38 @@ pcall(function()
     end
 end)
 
--- Normalize executor to folder name
 executor = executor:lower()
 if executor:find("xeno") then
     executor = "Xeno"
 elseif executor:find("jjsploit") then
     executor = "JJSploit"
 else
-    warn("[HellfireX] Unsupported executor: " .. executor)
+    warn("[Loader] Unsupported executor: " .. executor)
     return
 end
 
--- Load executor-specific Aimbot
-local aimbotURL = baseUrl .. "Scripts/" .. executor .. "/Aimbot.lua"
-local okAimbot, errAimbot = pcall(function()
-    loadstring(game:HttpGet(aimbotURL))()
-end)
-warn(okAimbot and "[HellfireX] Aimbot loaded!" or "[HellfireX] Failed to load Aimbot:", errAimbot)
+-- Base path
+local base = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
 
--- Load executor-specific ESP
-local espURL = baseUrl .. "Scripts/" .. executor .. "/ESP.lua"
-local okESP, errESP = pcall(function()
-    loadstring(game:HttpGet(espURL))()
+-- Load Aimbot for detected executor
+local aimbotUrl = base .. "Scripts/" .. executor .. "/Aimbot.lua"
+local okAimbot, errAimbot = pcall(function()
+    loadstring(game:HttpGet(aimbotUrl))()
 end)
-warn(okESP and "[HellfireX] ESP loaded!" or "[HellfireX] Failed to load ESP:", errESP)
+warn(okAimbot and "[Loader] Aimbot loaded" or "[Loader] Aimbot failed: " .. tostring(errAimbot))
+
+-- Load ESP (only for JJSploit for now)
+if executor == "JJSploit" then
+    local espUrl = base .. "Scripts/JJSploit/ESP.lua"
+    local okESP, errESP = pcall(function()
+        loadstring(game:HttpGet(espUrl))()
+    end)
+    warn(okESP and "[Loader] ESP loaded" or "[Loader] ESP failed: " .. tostring(errESP))
+end
 
 -- Load GUI
-local guiURL = baseUrl .. "GUI/UI.lua"
+local guiUrl = base .. "GUI/UI.lua"
 local okGUI, errGUI = pcall(function()
-    loadstring(game:HttpGet(guiURL))()
+    loadstring(game:HttpGet(guiUrl))()
 end)
-warn(okGUI and "[HellfireX] GUI loaded!" or "[HellfireX] Failed to load GUI:", errGUI)
+warn(okGUI and "[Loader] GUI loaded" or "[Loader] GUI failed: " .. tostring(errGUI))
