@@ -23,6 +23,25 @@ local MainFrame = Library:CreateWindow({
     }]]
 })
 
+-- ESP Tab
+local ESPSettings = getgenv().ESPSettings or {
+    Enabled = true,
+    ShowNames = true,
+    ShowHealth = false, -- unused for now
+    ShowBoxes = true,
+    ShowDirection = true,
+    TeamCheck = true
+}
+getgenv().ESPSettings = ESPSettings
+
+local ESPTab = MainFrame:CreateTab({ Name = "ESP" })
+local GeneralSection = ESPTab:CreateSection({ Name = "ESP Toggles" })
+GeneralSection:AddToggle({ Name = "ESP Enabled", Value = ESPSettings.Enabled, Callback = function(v) ESPSettings.Enabled = v end }).Default = ESPSettings.Enabled
+GeneralSection:AddToggle({ Name = "Show Boxes", Value = ESPSettings.ShowBoxes, Callback = function(v) ESPSettings.ShowBoxes = v end }).Default = ESPSettings.ShowBoxes
+GeneralSection:AddToggle({ Name = "Show Names", Value = ESPSettings.ShowNames, Callback = function(v) ESPSettings.ShowNames = v end }).Default = ESPSettings.ShowNames
+GeneralSection:AddToggle({ Name = "Show Tracer Line", Value = ESPSettings.ShowDirection, Callback = function(v) ESPSettings.ShowDirection = v end }).Default = ESPSettings.ShowDirection
+GeneralSection:AddToggle({ Name = "Team Check", Value = ESPSettings.TeamCheck, Callback = function(v) ESPSettings.TeamCheck = v end }).Default = ESPSettings.TeamCheck
+
 -- Aimbot Tab
 local AimbotTab = MainFrame:CreateTab({ Name = "Aimbot" })
 
@@ -47,25 +66,6 @@ FOVSection:AddSlider({ Name = "Sides", Value = FOVSettings.Sides, Min = 3, Max =
 FOVSection:AddToggle({ Name = "Filled Circle", Value = FOVSettings.Filled, Callback = function(v) FOVSettings.Filled = v end }).Default = FOVSettings.Filled
 FOVSection:AddColorpicker({ Name = "Circle Color", Value = FOVSettings.Color, Callback = function(v) FOVSettings.Color = v end }).Default = FOVSettings.Color
 FOVSection:AddColorpicker({ Name = "Locked Target Color", Value = FOVSettings.LockedColor, Callback = function(v) FOVSettings.LockedColor = v end }).Default = FOVSettings.LockedColor
-
--- ESP Tab
-local ESPSettings = getgenv().ESPSettings or {
-    Enabled = true,
-    ShowNames = true,
-    ShowHealth = false, -- unused for now
-    ShowBoxes = true,
-    ShowDirection = true,
-    TeamCheck = true
-}
-getgenv().ESPSettings = ESPSettings
-
-local ESPTab = MainFrame:CreateTab({ Name = "ESP" })
-local GeneralSection = ESPTab:CreateSection({ Name = "ESP Toggles" })
-GeneralSection:AddToggle({ Name = "ESP Enabled", Value = ESPSettings.Enabled, Callback = function(v) ESPSettings.Enabled = v end }).Default = ESPSettings.Enabled
-GeneralSection:AddToggle({ Name = "Show Boxes", Value = ESPSettings.ShowBoxes, Callback = function(v) ESPSettings.ShowBoxes = v end }).Default = ESPSettings.ShowBoxes
-GeneralSection:AddToggle({ Name = "Show Names", Value = ESPSettings.ShowNames, Callback = function(v) ESPSettings.ShowNames = v end }).Default = ESPSettings.ShowNames
-GeneralSection:AddToggle({ Name = "Show Tracer Line", Value = ESPSettings.ShowDirection, Callback = function(v) ESPSettings.ShowDirection = v end }).Default = ESPSettings.ShowDirection
-GeneralSection:AddToggle({ Name = "Team Check", Value = ESPSettings.TeamCheck, Callback = function(v) ESPSettings.TeamCheck = v end }).Default = ESPSettings.TeamCheck
 
 -- Functions Tab
 local FunctionsTab = MainFrame:CreateTab({ Name = "Functions" })
