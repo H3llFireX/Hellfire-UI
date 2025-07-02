@@ -1,5 +1,3 @@
--- Scripts/JJSploit/ESP.lua
-
 --// ENVIRONMENT SETUP
 getgenv().ESPSettings = getgenv().ESPSettings or {
     Enabled = true,
@@ -98,11 +96,7 @@ RunService.RenderStepped:Connect(function()
 
         local screenPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
         if not onScreen then
-            if ESPContainer[player] then
-                for _, obj in pairs(ESPContainer[player]) do
-                    obj.Visible = false
-                end
-            end
+            ClearESP(player)
             continue
         end
 
@@ -142,7 +136,7 @@ RunService.RenderStepped:Connect(function()
             esp.Name.Visible = false
         end
 
-        -- HealthBar (optional)
+        -- HealthBar
         if ESPSettings.ShowHealth then
             local ratio = math.clamp(hum.Health / hum.MaxHealth, 0, 1)
             esp.HealthBar.Size = Vector2.new(3, height * ratio)
@@ -152,7 +146,7 @@ RunService.RenderStepped:Connect(function()
             esp.HealthBar.Visible = false
         end
     end
-end) -- ✅ ← this was missing
+end)
 
 --// CLEANUP
 Players.PlayerRemoving:Connect(RemoveESP)
