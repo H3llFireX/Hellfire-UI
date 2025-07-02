@@ -1,5 +1,15 @@
 -- Scripts/JJSploit/ESP.lua
 
+-- Ensure global ESP settings exist
+getgenv().ESPSettings = getgenv().ESPSettings or {
+    Enabled = true,
+    ShowNames = true,
+    ShowHealth = true,
+    ShowBoxes = true,
+    ShowDirection = true,
+    TeamCheck = true
+}
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
@@ -52,7 +62,7 @@ RunService.RenderStepped:Connect(function()
                 local esp = ESPContainer[player]
 
                 -- Box
-                if getgenv().ESPSettings.ShowBoxes and onScreen then
+                if ESPSettings.ShowBoxes and onScreen then
                     esp.Box.Size = Vector2.new(math.abs(bottomRight.X - topLeft.X), math.abs(bottomRight.Y - topLeft.Y))
                     esp.Box.Position = Vector2.new(topLeft.X, topLeft.Y)
                     esp.Box.Visible = true
