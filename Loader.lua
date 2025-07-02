@@ -1,4 +1,4 @@
--- // Executor Detection
+-- Executor Detection
 local executor = "Unknown"
 
 pcall(function()
@@ -20,36 +20,35 @@ pcall(function()
 end)
 
 executor = executor:lower()
-
 if executor:find("xeno") then
     executor = "Xeno"
 elseif executor:find("jjsploit") then
     executor = "JJSploit"
 else
-    warn("[Loader] Unsupported executor:", executor)
+    warn("[Loader] Unsupported executor detected:", executor)
     return
 end
 
--- // Load Aimbot Script
+-- Base URL
 local baseUrl = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
-local aimbotURL = baseUrl .. "Scripts/" .. executor .. "/Aimbot.lua"
-local espURL = baseUrl .. "Scripts/" .. executor .. "/ESP.lua"
-local guiURL = baseUrl .. "GUI/UI.lua"
 
--- // Aimbot
-local okAimbot, errAimbot = pcall(function()
-    loadstring(game:HttpGet(aimbotURL))()
+-- Load Aimbot
+local aimbotUrl = baseUrl .. "Scripts/" .. executor .. "/Aimbot.lua"
+local ok1, err1 = pcall(function()
+    loadstring(game:HttpGet(aimbotUrl))()
 end)
-warn(okAimbot and "[Loader] Aimbot loaded successfully" or "[Loader] Aimbot failed:", errAimbot)
+warn(ok1 and "[Loader] Aimbot loaded for " .. executor or "[Loader] Aimbot load failed: " .. tostring(err1))
 
--- // ESP
-local okESP, errESP = pcall(function()
-    loadstring(game:HttpGet(espURL))()
+-- Load ESP
+local espUrl = baseUrl .. "Scripts/" .. executor .. "/ESP.lua"
+local ok2, err2 = pcall(function()
+    loadstring(game:HttpGet(espUrl))()
 end)
-warn(okESP and "[Loader] ESP loaded successfully" or "[Loader] ESP failed:", errESP)
+warn(ok2 and "[Loader] ESP loaded for " .. executor or "[Loader] ESP load failed: " .. tostring(err2))
 
--- // GUI
-local okGUI, errGUI = pcall(function()
-    loadstring(game:HttpGet(guiURL))()
+-- Load GUI
+local guiUrl = baseUrl .. "GUI/UI.lua"
+local ok3, err3 = pcall(function()
+    loadstring(game:HttpGet(guiUrl))()
 end)
-warn(okGUI and "[Loader] GUI loaded successfully" or "[Loader] GUI failed:", errGUI)
+warn(ok3 and "[Loader] GUI loaded successfully" or "[Loader] GUI failed: " .. tostring(err3))
