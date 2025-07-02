@@ -1,5 +1,6 @@
--- Scripts/JJSploit/ESP.lua (2D ESP with proper screen-edge hiding)
+-- Scripts/JJSploit/ESP.lua
 
+--// ENVIRONMENT SETUP
 getgenv().ESPSettings = getgenv().ESPSettings or {
     Enabled = true,
     ShowNames = true,
@@ -15,107 +16,157 @@ local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 local ESPSettings = getgenv().ESPSettings
 
-local Drawings = {}
+local ESPContainer = {}
 
-local function NewDrawing(type, props)
+--// UTILS
+local function CreateDrawingObject(type, props)
     local obj = Drawing.new(type)
-    for prop, val in pairs(props) do
-        obj[prop] = val
+    for prop, value in pairs(props) do
+        obj[prop] = value
     end
     return obj
 end
 
-local function ClearDrawings(player)
-    if Drawings[player] then
-        for _, obj in pairs(Drawings[player]) do
+local function CreateESPObjects()
+    return {
+        Box = CreateDrawingObject("Square", {
+            Thickness = 1,
+            Transparency = 1,
+            Filled = false,
+            Color = Color3.new(1, 1, 1),
+            Visible = false
+        }),
+        Name = CreateDrawingObject("Text", {
+            Size = 13,
+            Color = Color3.new(1, 1, 1),
+            Center = true,
+            Outline = true,
+            Visible = false
+        }),
+        HealthBar = CreateDrawingObject("Square", {
+            Thickness = 1,
+            Transparency = 1,
+            Filled = true,
+            Color = Color3.new(0, 1, 0),
+            Visible = false
+        }),
+        Direction = CreateDrawingObject("Line", {
+            Thickness = 2,
+            Transparency = 1,
+            Color = Color3.new(1, 1, 0),
+            Visible = false
+        })
+    }
+end
+
+local function ClearESP(player)
+    if ESPContainer[player] then
+        for _, obj in pairs(ESPContainer[player]) do
+            obj.Visible = false
+        end
+    end
+end
+
+local function RemoveESP(player)
+    if ESPContainer[player] then
+        for _, obj in pairs(ESPContainer[player]) do
             obj:Remove()
         end
-        Drawings[player] = nil
+        ESPContainer[player] = nil
     end
 end
 
-local function SetupDrawings(player)
-    if not Drawings[player] then
-        Drawings[player] = {
-            Box = NewDrawing("Square", {Thickness = 1, Color = Color3.new(1, 0, 0), Filled = false, Visible = false}),
-            Tracer = NewDrawing("Line", {Thickness = 1, Color = Color3.new(1, 0, 0), Visible = false}),
-            Name = NewDrawing("Text", {Size = 16, Center = true, Outline = true, Color = Color3.new(1,1,1), Visible = false}),
-        }
-    end
-end
-
---// Main render loop
+--// MAIN RENDER LOOP
 RunService.RenderStepped:Connect(function()
     if not ESPSettings.Enabled then
-        for _, tbl in pairs(Drawings) do
-            for _, obj in pairs(tbl) do
+        for _, esp in pairs(ESPContainer) do
+            for _, obj in pairs(esp) do
                 obj.Visible = false
             end
         end
         return
     end
 
-    for _, player in ipairs(Players:GetPlayers()) do
+    for _, player in pairs(Players:GetPlayers()) do
         if player == LocalPlayer then continue end
 
         local character = player.Character
-        local hrp = character and character:FindFirstChild("HumanoidRootPart")
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-        if not hrp or not humanoid or humanoid.Health <= 0 then
-            ClearDrawings(player)
+        local hrp = character and character:FindFirstChild("HumanoidRootPart")
+
+        if not character or not humanoid or not hrp or humanoid.Health <= 0 then
+            ClearESP(player)
             continue
         end
 
         if ESPSettings.TeamCheck and player.Team == LocalPlayer.Team then
-            ClearDrawings(player)
+            ClearESP(player)
             continue
         end
 
         local screenPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
         if not onScreen or screenPos.Z < 0 then
-            if Drawings[player] then
-                for _, obj in pairs(Drawings[player]) do
-                    obj.Visible = false
-                end
-            end
+            ClearESP(player)
             continue
         end
 
-        SetupDrawings(player)
-        local esp = Drawings[player]
+        -- Calculate 2D box
+        local topOffset = Vector3.new(0, 3, 0)
+        local bottomOffset = Vector3.new(0, -3, 0)
+        local top = Camera:WorldToViewportPoint(hrp.Position + topOffset)
+        local bottom = Camera:WorldToViewportPoint(hrp.Position + bottomOffset)
+        local height = math.abs(top.Y - bottom.Y)
+        local width = height / 2
+        local boxPos = Vector2.new(screenPos.X - width / 2, screenPos.Y - height / 2)
 
-        local boxWidth = 50
-        local boxHeight = 100
-        local topLeft = Vector2.new(screenPos.X - boxWidth / 2, screenPos.Y - boxHeight / 2)
+        if not ESPContainer[player] then
+            ESPContainer[player] = CreateESPObjects()
+        end
+
+        local esp = ESPContainer[player]
 
         -- Box
         if ESPSettings.ShowBoxes then
-            esp.Box.Position = topLeft
-            esp.Box.Size = Vector2.new(boxWidth, boxHeight)
+            esp.Box.Size = Vector2.new(width, height)
+            esp.Box.Position = boxPos
             esp.Box.Visible = true
         else
             esp.Box.Visible = false
         end
 
-        -- Tracer
-        if ESPSettings.ShowDirection then
-            esp.Tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
-            esp.Tracer.To = Vector2.new(screenPos.X, screenPos.Y)
-            esp.Tracer.Visible = true
+        -- Health Bar
+        if ESPSettings.ShowHealth then
+            local healthRatio = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+            local barHeight = height * healthRatio
+            esp.HealthBar.Size = Vector2.new(3, barHeight)
+            esp.HealthBar.Position = Vector2.new(boxPos.X - 5, boxPos.Y + (height - barHeight))
+            esp.HealthBar.Visible = true
         else
-            esp.Tracer.Visible = false
+            esp.HealthBar.Visible = false
         end
 
         -- Name
         if ESPSettings.ShowNames then
             esp.Name.Text = player.DisplayName
-            esp.Name.Position = Vector2.new(screenPos.X, topLeft.Y - 18)
+            esp.Name.Position = Vector2.new(screenPos.X, boxPos.Y - 15)
             esp.Name.Visible = true
         else
             esp.Name.Visible = false
         end
+
+        -- Direction Line
+        if ESPSettings.ShowDirection then
+            local forward = hrp.CFrame.LookVector * 3
+            local dirWorld = hrp.Position + forward
+            local dirScreen, onScreen2 = Camera:WorldToViewportPoint(dirWorld)
+            esp.Direction.From = Vector2.new(screenPos.X, screenPos.Y)
+            esp.Direction.To = Vector2.new(dirScreen.X, dirScreen.Y)
+            esp.Direction.Visible = onScreen2
+        else
+            esp.Direction.Visible = false
+        end
     end
 end)
 
--- Cleanup
-Players.PlayerRemoving:Connect(ClearDrawings)
+--// CLEANUP
+Players.PlayerRemoving:Connect(RemoveESP)
