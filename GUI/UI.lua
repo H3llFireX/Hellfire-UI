@@ -20,17 +20,6 @@ local MainFrame = Library:CreateWindow({
     }]]
 })
 
--- ESP Tab (Basic Setup Only)
-local ESPTab = MainFrame:CreateTab({
-    Name = "ESP"
-})
-
-local ESPSection = ESPTab:CreateSection({
-    Name = "Status"
-})
-
-ESPSection:AddLabel("ESP is enabled via script.")
-
 -- Aimbot Tab (Core, Checks, FOV)
 local AimbotTab = MainFrame:CreateTab({
     Name = "Aimbot"
@@ -150,6 +139,63 @@ FOVSection:AddColorpicker({
     Value = FOVSettings.LockedColor,
     Callback = function(v) FOVSettings.LockedColor = v end
 }).Default = FOVSettings.LockedColor
+
+--// ESP Tab
+local ESPSettings = getgenv().ESPSettings or {
+    Enabled = true,
+    ShowNames = true,
+    ShowHealth = false, -- unused in current ESP.lua
+    ShowBoxes = true,
+    ShowDirection = true,
+    TeamCheck = true
+}
+getgenv().ESPSettings = ESPSettings
+
+local ESPTab = MainFrame:CreateTab({
+    Name = "ESP"
+})
+
+local GeneralSection = ESPTab:CreateSection({ Name = "ESP Toggles" })
+
+GeneralSection:AddToggle({
+    Name = "ESP Enabled",
+    Value = ESPSettings.Enabled,
+    Callback = function(v)
+        ESPSettings.Enabled = v
+    end
+}).Default = ESPSettings.Enabled
+
+GeneralSection:AddToggle({
+    Name = "Show Boxes",
+    Value = ESPSettings.ShowBoxes,
+    Callback = function(v)
+        ESPSettings.ShowBoxes = v
+    end
+}).Default = ESPSettings.ShowBoxes
+
+GeneralSection:AddToggle({
+    Name = "Show Names",
+    Value = ESPSettings.ShowNames,
+    Callback = function(v)
+        ESPSettings.ShowNames = v
+    end
+}).Default = ESPSettings.ShowNames
+
+GeneralSection:AddToggle({
+    Name = "Show Tracer Line",
+    Value = ESPSettings.ShowDirection,
+    Callback = function(v)
+        ESPSettings.ShowDirection = v
+    end
+}).Default = ESPSettings.ShowDirection
+
+GeneralSection:AddToggle({
+    Name = "Team Check",
+    Value = ESPSettings.TeamCheck,
+    Callback = function(v)
+        ESPSettings.TeamCheck = v
+    end
+}).Default = ESPSettings.TeamCheck
 
 -- Functions Tab
 local FunctionsTab = MainFrame:CreateTab({
