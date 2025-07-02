@@ -1,4 +1,4 @@
--- Executor Detection
+-- Detect Executor
 local executor = "Unknown"
 
 pcall(function()
@@ -20,35 +20,36 @@ pcall(function()
 end)
 
 executor = executor:lower()
+
+-- Normalize and validate executor
 if executor:find("xeno") then
     executor = "Xeno"
 elseif executor:find("jjsploit") then
     executor = "JJSploit"
 else
-    warn("[Loader] Unsupported executor detected:", executor)
+    warn("[Loader] Unsupported executor: " .. executor)
     return
 end
 
--- Base URL
-local baseUrl = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
-
--- Load Aimbot
-local aimbotUrl = baseUrl .. "Scripts/" .. executor .. "/Aimbot.lua"
-local ok1, err1 = pcall(function()
-    loadstring(game:HttpGet(aimbotUrl))()
+-- Load Aimbot for the executor
+local aimbotURL = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Scripts/" .. executor .. "/Aimbot.lua"
+local successAimbot, errAimbot = pcall(function()
+    loadstring(game:HttpGet(aimbotURL))()
 end)
-warn(ok1 and "[Loader] Aimbot loaded for " .. executor or "[Loader] Aimbot load failed: " .. tostring(err1))
-
--- Load ESP
-local espUrl = baseUrl .. "Scripts/" .. executor .. "/ESP.lua"
-local ok2, err2 = pcall(function()
-    loadstring(game:HttpGet(espUrl))()
-end)
-warn(ok2 and "[Loader] ESP loaded for " .. executor or "[Loader] ESP load failed: " .. tostring(err2))
+warn(successAimbot and "[Loader] Aimbot loaded for " .. executor or "[Loader] Aimbot failed:", errAimbot)
 
 -- Load GUI
-local guiUrl = baseUrl .. "GUI/UI.lua"
-local ok3, err3 = pcall(function()
-    loadstring(game:HttpGet(guiUrl))()
+local successGUI, errGUI = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/GUI/UI.lua"))()
 end)
-warn(ok3 and "[Loader] GUI loaded successfully" or "[Loader] GUI failed: " .. tostring(err3))
+warn(successGUI and "[Loader] GUI loaded" or "[Loader] GUI failed:", errGUI)
+
+-- Load ESP only for JJSploit
+if executor == "JJSploit" then
+    local successESP, errESP = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Scripts/JJSploit/ESP.lua"))()
+    end)
+    warn(successESP and "[Loader] ESP loaded for JJSploit" or "[Loader] ESP failed:", errESP)
+else
+    warn("[Loader] ESP not supported for this executor: " .. executor)
+end
