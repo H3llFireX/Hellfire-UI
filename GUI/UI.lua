@@ -58,16 +58,16 @@ FOV:AddToggle({ Name = "Filled Circle", Value = FOVSettings.Filled, Callback = f
 FOV:AddColorpicker({ Name = "FOV Color", Value = FOVSettings.Color, Callback = function(v) FOVSettings.Color = v end })
 FOV:AddColorpicker({ Name = "Locked Color", Value = FOVSettings.LockedColor, Callback = function(v) FOVSettings.LockedColor = v end })
 
--- ESP Tab
-local ESPTab = MainFrame:CreateTab({ Name = "ESP" })
-local ESPOptions = ESPTab:CreateSection({ Name = "Options" })
+-- ESP Tab (Basic Setup Only)
+local ESPTab = MainFrame:CreateTab({
+    Name = "ESP"
+})
 
-ESPOptions:AddToggle({ Name = "Enabled", Value = ESPSettings.Enabled, Callback = function(v) ESPSettings.Enabled = v end })
-ESPOptions:AddToggle({ Name = "Show Boxes", Value = ESPSettings.ShowBoxes, Callback = function(v) ESPSettings.ShowBoxes = v end })
-ESPOptions:AddToggle({ Name = "Show Direction", Value = ESPSettings.ShowDirection, Callback = function(v) ESPSettings.ShowDirection = v end })
-ESPOptions:AddToggle({ Name = "Show Health Bars", Value = ESPSettings.ShowHealth, Callback = function(v) ESPSettings.ShowHealth = v end })
-ESPOptions:AddToggle({ Name = "Show Names", Value = ESPSettings.ShowNames, Callback = function(v) ESPSettings.ShowNames = v end })
-ESPOptions:AddToggle({ Name = "Team Check", Value = ESPSettings.TeamCheck, Callback = function(v) ESPSettings.TeamCheck = v end })
+local ESPSection = ESPTab:CreateSection({
+    Name = "Status"
+})
+
+ESPSection:AddLabel("ESP is enabled via script.")
 
 -- Functions Tab
 local FuncTab = MainFrame:CreateTab({ Name = "Functions" })
