@@ -1,4 +1,4 @@
--- Detect Executor
+-- // Executor Detection
 local executor = "Unknown"
 
 pcall(function()
@@ -19,40 +19,37 @@ pcall(function()
     end
 end)
 
--- Normalize executor name
 executor = executor:lower()
 
--- Paths
-local base = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
-local scriptPath, espPath
-
--- Aimbot executor-based path
 if executor:find("xeno") then
-    scriptPath = base .. "Scripts/Xeno/Aimbot.lua"
+    executor = "Xeno"
 elseif executor:find("jjsploit") then
-    scriptPath = base .. "Scripts/JJSploit/Aimbot.lua"
-    espPath = base .. "Scripts/JJSploit/ESP.lua"
+    executor = "JJSploit"
 else
-    warn("[Loader] Unsupported executor: " .. executor)
+    warn("[Loader] Unsupported executor:", executor)
     return
 end
 
--- Load Aimbot
-local ok1, err1 = pcall(function()
-    loadstring(game:HttpGet(scriptPath))()
-end)
-warn(ok1 and "[Loader] Aimbot loaded" or "[Loader] Aimbot failed:", err1)
+-- // Load Aimbot Script
+local baseUrl = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
+local aimbotURL = baseUrl .. "Scripts/" .. executor .. "/Aimbot.lua"
+local espURL = baseUrl .. "Scripts/" .. executor .. "/ESP.lua"
+local guiURL = baseUrl .. "GUI/UI.lua"
 
--- Load ESP (JJSploit only)
-if espPath then
-    local okESP, errESP = pcall(function()
-        loadstring(game:HttpGet(espPath))()
-    end)
-    warn(okESP and "[Loader] ESP loaded" or "[Loader] ESP failed:", errESP)
-end
-
--- Load GUI
-local ok2, err2 = pcall(function()
-    loadstring(game:HttpGet(base .. "GUI/UI.lua"))()
+-- // Aimbot
+local okAimbot, errAimbot = pcall(function()
+    loadstring(game:HttpGet(aimbotURL))()
 end)
-warn(ok2 and "[Loader] GUI loaded" or "[Loader] GUI failed:", err2)
+warn(okAimbot and "[Loader] Aimbot loaded successfully" or "[Loader] Aimbot failed:", errAimbot)
+
+-- // ESP
+local okESP, errESP = pcall(function()
+    loadstring(game:HttpGet(espURL))()
+end)
+warn(okESP and "[Loader] ESP loaded successfully" or "[Loader] ESP failed:", errESP)
+
+-- // GUI
+local okGUI, errGUI = pcall(function()
+    loadstring(game:HttpGet(guiURL))()
+end)
+warn(okGUI and "[Loader] GUI loaded successfully" or "[Loader] GUI failed:", errGUI)
