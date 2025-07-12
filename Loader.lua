@@ -23,30 +23,27 @@ getgenv().ESPSettings = {
     HealthCheck = true
 }
 
---// Load Scripts
-local scriptsFolder = "Hellfire-UI/Scripts"
+--// Load Scripts from GitHub
+local githubBase = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Scripts/"
 
-local function safeLoad(fileName)
-    local path = scriptsFolder .. "/" .. fileName
-    if isfile and isfile(path) then
-        local src = readfile(path)
-        local success, result = pcall(loadstring, src)
-        if success and result then
-            local ok, err = pcall(result)
-            if not ok then
-                warn("[Hellfire Loader] Error running " .. fileName .. ": " .. tostring(err))
-            end
-        else
-            warn("[Hellfire Loader] Failed to compile " .. fileName)
+local function loadRemoteScript(fileName)
+    local success, result = pcall(function()
+        return game:HttpGet(githubBase .. fileName)
+    end)
+
+    if success and result then
+        local runSuccess, err = pcall(loadstring(result))
+        if not runSuccess then
+            warn("[Hellfire Loader] Error executing " .. fileName .. ": " .. tostring(err))
         end
     else
-        warn("[Hellfire Loader] Missing file: " .. path)
+        warn("[Hellfire Loader] Failed to fetch " .. fileName)
     end
 end
 
 -- Load Aimbot and ESP
-safeLoad("aimbot.lua")
-safeLoad("esp.lua")
+loadRemoteScript("aimbot.lua")
+loadRemoteScript("esp.lua")
 
--- Load UI last to bind settings
-safeLoad("ui.lua")
+-- Load UI last
+loadRemoteScript("ui.lua")
