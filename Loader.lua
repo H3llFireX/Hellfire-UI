@@ -1,50 +1,45 @@
--- Hellfire Loader (Universal)
-
-if getgenv().HellfireLoaded then
-    return
-end
-
-getgenv().HellfireLoaded = true
-
--- Setup environment
-getgenv().HellfireAimbot = {
-    Settings = {
-        Enabled = true,
-        TargetPart = "Head",
-        Smoothness = 0.2,
-        FOV = 150,
-        FOVColor = Color3.fromRGB(255, 0, 0),
-        TeamCheck = true,
-        WallCheck = true,
-        HealthCheck = true,
-        TriggerKey = Enum.UserInputType.MouseButton2,
-    }
+--// Globals
+getgenv().AimbotSettings = {
+    Enabled = true,
+    TriggerKey = "MouseButton2",
+    TeamCheck = true,
+    WallCheck = true,
+    HealthCheck = true
 }
 
-getgenv().HellfireESP = {
-    Settings = {
-        Enabled = true,
-        Boxes = true,
-        HealthBars = true,
-        ShowDistance = true,
-        TeamCheck = true,
-        WallCheck = true,
-        HealthCheck = true,
-    }
+getgenv().ESPSettings = {
+    Boxes = true,
+    HealthBars = true,
+    Distance = true,
+    TeamCheck = true,
+    WallCheck = true,
+    HealthCheck = true
 }
 
--- Script loader
-local function loadScript(name)
-    local success, result = pcall(function()
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Scripts/" .. name .. ".lua"))()
-    end)
+--// Load Scripts
+local scriptsFolder = "Hellfire-UI/Scripts"
 
-    if not success then
-        warn("[Hellfire Loader] Failed to load:", name, "\n", result)
+local function safeLoad(fileName)
+    local path = scriptsFolder .. "/" .. fileName
+    if isfile and isfile(path) then
+        local src = readfile(path)
+        local success, result = pcall(loadstring, src)
+        if success and result then
+            local ok, err = pcall(result)
+            if not ok then
+                warn("[Hellfire Loader] Error running " .. fileName .. ": " .. tostring(err))
+            end
+        else
+            warn("[Hellfire Loader] Failed to compile " .. fileName)
+        end
+    else
+        warn("[Hellfire Loader] Missing file: " .. path)
     end
 end
 
--- Load all modules
-loadScript("Aimbot")
-loadScript("ESP")
-loadScript("UI")
+-- Load Aimbot and ESP
+safeLoad("aimbot.lua")
+safeLoad("esp.lua")
+
+-- Load UI last to bind settings
+safeLoad("ui.lua")
