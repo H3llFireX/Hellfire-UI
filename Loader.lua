@@ -1,3 +1,10 @@
+--// Wait until the player is fully loaded into the match
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+repeat task.wait() until LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+repeat task.wait() until workspace.CurrentCamera
+
 --// Globals
 getgenv().AimbotSettings = {
     Enabled = true,
