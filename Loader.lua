@@ -1,61 +1,50 @@
--- Wait for the game to finish loading
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
+-- Hellfire Loader (Universal)
 
---==[ Executor Detection ]==--
-local executor = "Unknown"
-
-pcall(function()
-    if identifyexecutor then
-        executor = identifyexecutor()
-    elseif getexecutorname then
-        executor = getexecutorname()
-    elseif syn then
-        executor = "Synapse X"
-    elseif is_sirhurt_closure then
-        executor = "SirHurt"
-    elseif isexecutorclosure then
-        executor = "Script-Ware"
-    elseif KRNL_LOADED then
-        executor = "KRNL"
-    elseif JJSploit then
-        executor = "JJSploit"
-    end
-end)
-
-executor = executor:lower()
-if executor:find("xeno") then
-    executor = "Xeno"
-elseif executor:find("jjsploit") then
-    executor = "JJSploit"
-else
-    warn("[Loader] Unsupported executor: " .. executor)
+if getgenv().HellfireLoaded then
     return
 end
 
---==[ Base Path ]==--
-local base = "https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/"
+getgenv().HellfireLoaded = true
 
---==[ Load Aimbot ]==--
-local aimbotUrl = base .. "Scripts/" .. executor .. "/Aimbot.lua"
-local okAimbot, errAimbot = pcall(function()
-    loadstring(game:HttpGet(aimbotUrl))()
-end)
-warn(okAimbot and "[Loader] ✅ Aimbot loaded" or "[Loader] ❌ Aimbot failed: " .. tostring(errAimbot))
+-- Setup environment
+getgenv().HellfireAimbot = {
+    Settings = {
+        Enabled = true,
+        TargetPart = "Head",
+        Smoothness = 0.2,
+        FOV = 150,
+        FOVColor = Color3.fromRGB(255, 0, 0),
+        TeamCheck = true,
+        WallCheck = true,
+        HealthCheck = true,
+        TriggerKey = Enum.UserInputType.MouseButton2,
+    }
+}
 
---==[ Load ESP (JJSploit Only) ]==--
-if executor == "JJSploit" then
-    local espUrl = base .. "Scripts/JJSploit/ESP.lua"
-    local okESP, errESP = pcall(function()
-        loadstring(game:HttpGet(espUrl))()
+getgenv().HellfireESP = {
+    Settings = {
+        Enabled = true,
+        Boxes = true,
+        HealthBars = true,
+        ShowDistance = true,
+        TeamCheck = true,
+        WallCheck = true,
+        HealthCheck = true,
+    }
+}
+
+-- Script loader
+local function loadScript(name)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Scripts/" .. name .. ".lua"))()
     end)
-    warn(okESP and "[Loader] ✅ ESP loaded" or "[Loader] ❌ ESP failed: " .. tostring(errESP))
+
+    if not success then
+        warn("[Hellfire Loader] Failed to load:", name, "\n", result)
+    end
 end
 
---==[ Load GUI ]==--
-local guiUrl = base .. "GUI/UI.lua"
-local okGUI, errGUI = pcall(function()
-    loadstring(game:HttpGet(guiUrl))()
-end)
-warn(okGUI and "[Loader] ✅ GUI loaded" or "[Loader] ❌ GUI failed: " .. tostring(errGUI))
+-- Load all modules
+loadScript("Aimbot")
+loadScript("ESP")
+loadScript("UI")
