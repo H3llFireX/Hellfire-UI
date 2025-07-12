@@ -1,119 +1,136 @@
--- UI.lua
--- Hellfire UI for Aimbot and ESP
-
+--// Dependencies
 local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+local Library = loadstring(game:HttpGet("https://pastebin.com/raw/3eG25KZZ"))() -- Replace with your actual UI library URL
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/pepsi-deluxe/ui-libs/main/pepsi-ui.lua"))()
-local Window = Library:CreateWindow({ Name = "Hellfire", Themeable = {}, Background = "" })
+--// UI Table
+local GUI = {}
+local UIVisible = true
 
--- Aimbot + ESP environment (must be shared externally)
-local Aimbot = getgenv().HellfireAimbot
-local ESP = getgenv().HellfireESP
+--// Window
+local MainWindow = Library:CreateWindow({
+	Name = "Hellfire",
+	Themeable = {
+		Image = "7059346386",
+		Info = "Made by Hellfire",
+		Credit = false
+	},
+	Background = "",
+	Theme = [[{"__Designer.Colors.topGradient":"3F0C64","__Designer.Colors.section":"C259FB"}]]
+})
 
--- Aimbot Tab
-local AimbotTab = Window:CreateTab({ Name = "Aimbot" })
+GUI.MainWindow = MainWindow
 
-local AimbotSettings = AimbotTab:CreateSection({ Name = "Aimbot Settings" })
-AimbotSettings:AddToggle({
-    Name = "Enabled",
-    Value = Aimbot.Settings.Enabled,
-    Callback = function(val) Aimbot.Settings.Enabled = val end
-}).Default = Aimbot.Settings.Enabled
+--// Aimbot Tab
+local AimbotTab = MainWindow:CreateTab({ Name = "Aimbot" })
+local AimbotSection = AimbotTab:CreateSection({ Name = "Aimbot Settings" })
 
-AimbotSettings:AddDropdown({
-    Name = "Target Part",
-    List = { "Head", "HumanoidRootPart", "Torso" },
-    Value = Aimbot.Settings.TargetPart,
-    Callback = function(val) Aimbot.Settings.TargetPart = val end
-}).Default = Aimbot.Settings.TargetPart
+AimbotSection:AddToggle({
+	Name = "Enabled",
+	Callback = function(Value)
+		getgenv().AimbotSettings.Enabled = Value
+	end
+})
 
-AimbotSettings:AddSlider({
-    Name = "Smoothness",
-    Min = 0,
-    Max = 1,
-    Decimals = 2,
-    Value = Aimbot.Settings.Smoothness,
-    Callback = function(val) Aimbot.Settings.Smoothness = val end
-}).Default = Aimbot.Settings.Smoothness
+AimbotSection:AddToggle({
+	Name = "Team Check",
+	Callback = function(Value)
+		getgenv().AimbotSettings.TeamCheck = Value
+	end
+})
 
-AimbotSettings:AddSlider({
-    Name = "FOV",
-    Min = 0,
-    Max = 500,
-    Value = Aimbot.Settings.FOV,
-    Callback = function(val) Aimbot.Settings.FOV = val end
-}).Default = Aimbot.Settings.FOV
+AimbotSection:AddToggle({
+	Name = "Wall Check",
+	Callback = function(Value)
+		getgenv().AimbotSettings.WallCheck = Value
+	end
+})
 
-AimbotSettings:AddColorpicker({
-    Name = "FOV Color",
-    Value = Aimbot.Settings.FOVColor,
-    Callback = function(val) Aimbot.Settings.FOVColor = val end
-}).Default = Aimbot.Settings.FOVColor
+AimbotSection:AddToggle({
+	Name = "Health Check",
+	Callback = function(Value)
+		getgenv().AimbotSettings.HealthCheck = Value
+	end
+})
 
-AimbotSettings:AddToggle({
-    Name = "Team Check",
-    Value = Aimbot.Settings.TeamCheck,
-    Callback = function(val) Aimbot.Settings.TeamCheck = val end
-}).Default = Aimbot.Settings.TeamCheck
+AimbotSection:AddTextbox({
+	Name = "Trigger Key",
+	Value = "MouseButton2",
+	Callback = function(New)
+		getgenv().AimbotSettings.TriggerKey = New
+	end
+})
 
-AimbotSettings:AddToggle({
-    Name = "Wall Check",
-    Value = Aimbot.Settings.WallCheck,
-    Callback = function(val) Aimbot.Settings.WallCheck = val end
-}).Default = Aimbot.Settings.WallCheck
-
-AimbotSettings:AddToggle({
-    Name = "Health Check",
-    Value = Aimbot.Settings.HealthCheck,
-    Callback = function(val) Aimbot.Settings.HealthCheck = val end
-}).Default = Aimbot.Settings.HealthCheck
-
--- ESP Tab
-local ESPTab = Window:CreateTab({ Name = "ESP" })
-
+--// ESP Tab
+local ESPTab = MainWindow:CreateTab({ Name = "ESP" })
 local ESPSection = ESPTab:CreateSection({ Name = "ESP Settings" })
 
 ESPSection:AddToggle({
-    Name = "Enabled",
-    Value = ESP.Settings.Enabled,
-    Callback = function(val) ESP.Settings.Enabled = val end
-}).Default = ESP.Settings.Enabled
+	Name = "Boxes",
+	Callback = function(Value)
+		getgenv().ESPSettings.Boxes = Value
+	end
+})
 
 ESPSection:AddToggle({
-    Name = "Boxes",
-    Value = ESP.Settings.Boxes,
-    Callback = function(val) ESP.Settings.Boxes = val end
-}).Default = ESP.Settings.Boxes
+	Name = "Health Bars",
+	Callback = function(Value)
+		getgenv().ESPSettings.HealthBars = Value
+	end
+})
 
 ESPSection:AddToggle({
-    Name = "Health Bars",
-    Value = ESP.Settings.HealthBars,
-    Callback = function(val) ESP.Settings.HealthBars = val end
-}).Default = ESP.Settings.HealthBars
+	Name = "Distance",
+	Callback = function(Value)
+		getgenv().ESPSettings.Distance = Value
+	end
+})
 
 ESPSection:AddToggle({
-    Name = "Show Distance",
-    Value = ESP.Settings.ShowDistance,
-    Callback = function(val) ESP.Settings.ShowDistance = val end
-}).Default = ESP.Settings.ShowDistance
+	Name = "Team Check",
+	Callback = function(Value)
+		getgenv().ESPSettings.TeamCheck = Value
+	end
+})
 
 ESPSection:AddToggle({
-    Name = "Team Check",
-    Value = ESP.Settings.TeamCheck,
-    Callback = function(val) ESP.Settings.TeamCheck = val end
-}).Default = ESP.Settings.TeamCheck
+	Name = "Wall Check",
+	Callback = function(Value)
+		getgenv().ESPSettings.WallCheck = Value
+	end
+})
 
 ESPSection:AddToggle({
-    Name = "Wall Check",
-    Value = ESP.Settings.WallCheck,
-    Callback = function(val) ESP.Settings.WallCheck = val end
-}).Default = ESP.Settings.WallCheck
+	Name = "Health Check",
+	Callback = function(Value)
+		getgenv().ESPSettings.HealthCheck = Value
+	end
+})
 
-ESPSection:AddToggle({
-    Name = "Health Check",
-    Value = ESP.Settings.HealthCheck,
-    Callback = function(val) ESP.Settings.HealthCheck = val end
-}).Default = ESP.Settings.HealthCheck
+--// Settings Tab
+local SettingsTab = MainWindow:CreateTab({ Name = "Settings" })
+local SettingsSection = SettingsTab:CreateSection({ Name = "UI Options" })
+
+SettingsSection:AddButton({
+	Name = "Unload",
+	Callback = function()
+		Library:Unload()
+	end
+})
+
+SettingsSection:AddButton({
+	Name = "Self Destruct",
+	Callback = function()
+		if Library then Library:Unload() end
+		script:Destroy()
+	end
+})
+
+--// GUI Hide Toggle with Delete key
+UserInputService.InputBegan:Connect(function(input, processed)
+	if not processed and input.KeyCode == Enum.KeyCode.Delete then
+		UIVisible = not UIVisible
+		MainWindow:SetVisibility(UIVisible)
+	end
+end)
+
+return GUI
