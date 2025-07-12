@@ -1,109 +1,119 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/H3llFireX/Hellfire-UI/main/Libs/PepsiUILibrary.lua"))()
-local Aimbot = getgenv().Aimbot
-if not Aimbot then
-    warn("[UI] Aimbot not detected — make sure to run the loader first!")
-    return
-end
+-- UI.lua
+-- Hellfire UI for Aimbot and ESP
 
-local Settings, FOVSettings, Functions = Aimbot.Settings, Aimbot.FOVSettings, Aimbot.Functions
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
 
--- Main GUI Window
-local MainFrame = Library:CreateWindow({
-    Name = "HellfireX",
-    Themeable = {
-        Image = "", -- Optional background image
-        Info = "Powered by HellfireX",
-        Credit = false
-    },
-    Background = "",
-    Theme = [[{
-        "__Designer.Settings.ShowHideKey": "Enum.KeyCode.Delete"
-    }]]
-})
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/pepsi-deluxe/ui-libs/main/pepsi-ui.lua"))()
+local Window = Library:CreateWindow({ Name = "Hellfire", Themeable = {}, Background = "" })
 
-------------------------------------------------------------
+-- Aimbot + ESP environment (must be shared externally)
+local Aimbot = getgenv().HellfireAimbot
+local ESP = getgenv().HellfireESP
+
 -- Aimbot Tab
-------------------------------------------------------------
-local AimbotTab = MainFrame:CreateTab({ Name = "Aimbot" })
+local AimbotTab = Window:CreateTab({ Name = "Aimbot" })
 
-local CoreSection = AimbotTab:CreateSection({ Name = "Core" })
-CoreSection:AddToggle({ Name = "Enabled", Value = Settings.Enabled, Callback = function(v) Settings.Enabled = v end }).Default = Settings.Enabled
-CoreSection:AddToggle({ Name = "Toggle Mode", Value = Settings.Toggle, Callback = function(v) Settings.Toggle = v end }).Default = Settings.Toggle
-CoreSection:AddTextbox({ Name = "Trigger Key", Value = Settings.TriggerKey, Callback = function(v) Settings.TriggerKey = v end }).Default = Settings.TriggerKey
-CoreSection:AddSlider({ Name = "Sensitivity", Value = Settings.Sensitivity, Min = 0, Max = 1, Decimals = 2, Callback = function(v) Settings.Sensitivity = v end }).Default = Settings.Sensitivity
+local AimbotSettings = AimbotTab:CreateSection({ Name = "Aimbot Settings" })
+AimbotSettings:AddToggle({
+    Name = "Enabled",
+    Value = Aimbot.Settings.Enabled,
+    Callback = function(val) Aimbot.Settings.Enabled = val end
+}).Default = Aimbot.Settings.Enabled
 
-local CheckSection = AimbotTab:CreateSection({ Name = "Checks" })
-CheckSection:AddToggle({ Name = "Team Check", Value = Settings.TeamCheck, Callback = function(v) Settings.TeamCheck = v end }).Default = Settings.TeamCheck
-CheckSection:AddToggle({ Name = "Alive Check", Value = Settings.AliveCheck, Callback = function(v) Settings.AliveCheck = v end }).Default = Settings.AliveCheck
-CheckSection:AddToggle({ Name = "Wall Check", Value = Settings.WallCheck, Callback = function(v) Settings.WallCheck = v end }).Default = Settings.WallCheck
+AimbotSettings:AddDropdown({
+    Name = "Target Part",
+    List = { "Head", "HumanoidRootPart", "Torso" },
+    Value = Aimbot.Settings.TargetPart,
+    Callback = function(val) Aimbot.Settings.TargetPart = val end
+}).Default = Aimbot.Settings.TargetPart
 
-local FOVSection = AimbotTab:CreateSection({ Name = "FOV" })
-FOVSection:AddToggle({ Name = "Show FOV Circle", Value = FOVSettings.Visible, Callback = function(v) FOVSettings.Visible = v end }).Default = FOVSettings.Visible
-FOVSection:AddToggle({ Name = "Enabled", Value = FOVSettings.Enabled, Callback = function(v) FOVSettings.Enabled = v end }).Default = FOVSettings.Enabled
-FOVSection:AddSlider({ Name = "Radius", Value = FOVSettings.Amount, Min = 10, Max = 300, Callback = function(v) FOVSettings.Amount = v end }).Default = FOVSettings.Amount
-FOVSection:AddSlider({ Name = "Thickness", Value = FOVSettings.Thickness, Min = 1, Max = 10, Callback = function(v) FOVSettings.Thickness = v end }).Default = FOVSettings.Thickness
-FOVSection:AddSlider({ Name = "Transparency", Value = FOVSettings.Transparency, Min = 0, Max = 1, Decimals = 2, Callback = function(v) FOVSettings.Transparency = v end }).Default = FOVSettings.Transparency
-FOVSection:AddSlider({ Name = "Sides", Value = FOVSettings.Sides, Min = 3, Max = 60, Callback = function(v) FOVSettings.Sides = v end }).Default = FOVSettings.Sides
-FOVSection:AddToggle({ Name = "Filled", Value = FOVSettings.Filled, Callback = function(v) FOVSettings.Filled = v end }).Default = FOVSettings.Filled
-FOVSection:AddColorpicker({ Name = "Circle Color", Value = FOVSettings.Color, Callback = function(v) FOVSettings.Color = v end }).Default = FOVSettings.Color
-FOVSection:AddColorpicker({ Name = "Target Color", Value = FOVSettings.LockedColor, Callback = function(v) FOVSettings.LockedColor = v end }).Default = FOVSettings.LockedColor
+AimbotSettings:AddSlider({
+    Name = "Smoothness",
+    Min = 0,
+    Max = 1,
+    Decimals = 2,
+    Value = Aimbot.Settings.Smoothness,
+    Callback = function(val) Aimbot.Settings.Smoothness = val end
+}).Default = Aimbot.Settings.Smoothness
 
-------------------------------------------------------------
+AimbotSettings:AddSlider({
+    Name = "FOV",
+    Min = 0,
+    Max = 500,
+    Value = Aimbot.Settings.FOV,
+    Callback = function(val) Aimbot.Settings.FOV = val end
+}).Default = Aimbot.Settings.FOV
+
+AimbotSettings:AddColorpicker({
+    Name = "FOV Color",
+    Value = Aimbot.Settings.FOVColor,
+    Callback = function(val) Aimbot.Settings.FOVColor = val end
+}).Default = Aimbot.Settings.FOVColor
+
+AimbotSettings:AddToggle({
+    Name = "Team Check",
+    Value = Aimbot.Settings.TeamCheck,
+    Callback = function(val) Aimbot.Settings.TeamCheck = val end
+}).Default = Aimbot.Settings.TeamCheck
+
+AimbotSettings:AddToggle({
+    Name = "Wall Check",
+    Value = Aimbot.Settings.WallCheck,
+    Callback = function(val) Aimbot.Settings.WallCheck = val end
+}).Default = Aimbot.Settings.WallCheck
+
+AimbotSettings:AddToggle({
+    Name = "Health Check",
+    Value = Aimbot.Settings.HealthCheck,
+    Callback = function(val) Aimbot.Settings.HealthCheck = val end
+}).Default = Aimbot.Settings.HealthCheck
+
 -- ESP Tab
-------------------------------------------------------------
-local ESPSettings = getgenv().ESPSettings or {
-    Enabled = true,
-    ShowNames = true,
-    ShowHealth = true,
-    ShowBoxes = true,
-    ShowDirection = true,
-    TeamCheck = true
-}
-getgenv().ESPSettings = ESPSettings
+local ESPTab = Window:CreateTab({ Name = "ESP" })
 
-local ESPTab = MainFrame:CreateTab({ Name = "ESP" })
-local ESPSection = ESPTab:CreateSection({ Name = "Visuals" })
+local ESPSection = ESPTab:CreateSection({ Name = "ESP Settings" })
 
-ESPSection:AddToggle({ Name = "Enable ESP", Value = ESPSettings.Enabled, Callback = function(v) ESPSettings.Enabled = v end }).Default = ESPSettings.Enabled
-ESPSection:AddToggle({ Name = "Show Boxes", Value = ESPSettings.ShowBoxes, Callback = function(v) ESPSettings.ShowBoxes = v end }).Default = ESPSettings.ShowBoxes
-ESPSection:AddToggle({ Name = "Show Names", Value = ESPSettings.ShowNames, Callback = function(v) ESPSettings.ShowNames = v end }).Default = ESPSettings.ShowNames
-ESPSection:AddToggle({ Name = "Show Tracer", Value = ESPSettings.ShowDirection, Callback = function(v) ESPSettings.ShowDirection = v end }).Default = ESPSettings.ShowDirection
-ESPSection:AddToggle({ Name = "Show Health", Value = ESPSettings.ShowHealth, Callback = function(v) ESPSettings.ShowHealth = v end }).Default = ESPSettings.ShowHealth
-ESPSection:AddToggle({ Name = "Team Check", Value = ESPSettings.TeamCheck, Callback = function(v) ESPSettings.TeamCheck = v end }).Default = ESPSettings.TeamCheck
+ESPSection:AddToggle({
+    Name = "Enabled",
+    Value = ESP.Settings.Enabled,
+    Callback = function(val) ESP.Settings.Enabled = val end
+}).Default = ESP.Settings.Enabled
 
-------------------------------------------------------------
--- Utilities Tab
-------------------------------------------------------------
-local UtilitiesTab = MainFrame:CreateTab({ Name = "Utilities" })
-local UtilitySection = UtilitiesTab:CreateSection({ Name = "Controls" })
+ESPSection:AddToggle({
+    Name = "Boxes",
+    Value = ESP.Settings.Boxes,
+    Callback = function(val) ESP.Settings.Boxes = val end
+}).Default = ESP.Settings.Boxes
 
-UtilitySection:AddButton({
-    Name = "Unload GUI",
-    Callback = function()
-        Library:Unload()
-        warn("[HellfireX] GUI unloaded.")
-    end
-})
+ESPSection:AddToggle({
+    Name = "Health Bars",
+    Value = ESP.Settings.HealthBars,
+    Callback = function(val) ESP.Settings.HealthBars = val end
+}).Default = ESP.Settings.HealthBars
 
-UtilitySection:AddButton({
-    Name = "Self Destruct (Kill Script)",
-    Callback = function()
-        Library:Unload()
-        if getgenv then
-            getgenv().Aimbot = nil
-            getgenv().ESPSettings = nil
-        end
-        for _, conn in ipairs(getconnections(game:GetService("RunService").RenderStepped)) do
-            conn:Disable()
-        end
-        warn("[HellfireX] Self-destruct completed.")
-    end
-})
+ESPSection:AddToggle({
+    Name = "Show Distance",
+    Value = ESP.Settings.ShowDistance,
+    Callback = function(val) ESP.Settings.ShowDistance = val end
+}).Default = ESP.Settings.ShowDistance
 
-UtilitySection:AddTextbox({
-    Name = "Set GUI Toggle Key",
-    Value = "Delete",
-    Callback = function(val)
-        Library.Keybind = Enum.KeyCode[val] or Enum.KeyCode.Delete
-    end
-}).Default = "Delete"
+ESPSection:AddToggle({
+    Name = "Team Check",
+    Value = ESP.Settings.TeamCheck,
+    Callback = function(val) ESP.Settings.TeamCheck = val end
+}).Default = ESP.Settings.TeamCheck
+
+ESPSection:AddToggle({
+    Name = "Wall Check",
+    Value = ESP.Settings.WallCheck,
+    Callback = function(val) ESP.Settings.WallCheck = val end
+}).Default = ESP.Settings.WallCheck
+
+ESPSection:AddToggle({
+    Name = "Health Check",
+    Value = ESP.Settings.HealthCheck,
+    Callback = function(val) ESP.Settings.HealthCheck = val end
+}).Default = ESP.Settings.HealthCheck
